@@ -69,26 +69,24 @@ In
 we need to require the library first:
 
 <pre class="lang-javascript">
-#!/usr/bin/env node
-
-var amqp = require('amqplib/callback_api');
+const amqp = require('amqplib/callback_api');
 </pre>
 
 then connect to RabbitMQ server
 
 <pre class="lang-javascript">
-amqp.connect('amqp://localhost', function(error0, connection) {});
+amqp.connect('amqp://localhost', (error0, connection) => {});
 </pre>
 
 Next we create a channel, which is where most of the API for getting
 things done resides:
 
 <pre class="lang-javascript">
-amqp.connect('amqp://localhost', function(error0, connection) {
+amqp.connect('amqp://localhost', (error0, connection) => {
   if (error0) {
     throw error0;
   }
-  connection.createChannel(function(error1, channel) {});
+  connection.createChannel((error1, channel) => {});
 });
 </pre>
 
@@ -96,16 +94,16 @@ To send, we must declare a queue for us to send to; then we can publish a messag
 to the queue:
 
 <pre class="lang-javascript">
-amqp.connect('amqp://localhost', function(error0, connection) {
+amqp.connect('amqp://localhost', (error0, connection) => {
   if (error0) {
     throw error0;
   }
-  connection.createChannel(function(error1, channel) {
+  connection.createChannel((error1, channel) => {
     if (error1) {
       throw error1;
     }
-    var queue = 'hello';
-    var msg = 'Hello world';
+    let queue = 'hello';
+    let msg = 'Hello world';
 
     channel.assertQueue(queue, {
       durable: false
@@ -124,10 +122,10 @@ whatever you like there.
 Lastly, we close the connection and exit;
 
 <pre class="lang-javascript">
-setTimeout(function() { 
+setTimeout(() => { 
   connection.close(); 
   process.exit(0) 
-  }, 500);
+}, 500);
 </pre>
 
 [Here's the whole send.js script](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/javascript-nodejs/src/send.js).
@@ -157,9 +155,7 @@ keep the consumer running to listen for messages and print them out.
 The code (in [`receive.js`](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/javascript-nodejs/src/receive.js)) has the same require as `send`:
 
 <pre class="lang-javascript">
-#!/usr/bin/env node
-
-var amqp = require('amqplib/callback_api');
+const amqp = require('amqplib/callback_api');
 </pre>
 
 Setting up is the same as the publisher; we open a connection and a
@@ -167,15 +163,15 @@ channel, and declare the queue from which we're going to consume.
 Note this matches up with the queue that `sendToQueue` publishes to.
 
 <pre class="lang-javascript">
-amqp.connect('amqp://localhost', function(error0, connection) {
+amqp.connect('amqp://localhost', (error0, connection) => {
   if (error0) {
     throw error0;
   }
-  connection.createChannel(function(error1, channel) {
+  connection.createChannel((error1, channel) => {
     if (error1) {
       throw error1;
     }
-    var queue = 'hello';
+    let queue = 'hello';
 
     channel.assertQueue(queue, {
       durable: false
@@ -195,7 +191,7 @@ our consumer. This is what `Channel.consume` does.
 
 <pre class="lang-javascript">
 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
-channel.consume(queue, function(msg) {
+channel.consume(queue, msg => {
   console.log(" [x] Received %s", msg.content.toString());
 }, {
     noAck: true
@@ -209,13 +205,13 @@ channel.consume(queue, function(msg) {
 Now we can run both scripts. In a terminal, from the rabbitmq-tutorials/javascript-nodejs/src/ folder, run the publisher:
 
 <pre class="lang-bash">
-./send.js
+node send.js
 </pre>
 
 then, run the consumer:
 
 <pre class="lang-bash">
-./receive.js
+node receive.js
 </pre>
 
 The consumer will print the message it gets from the publisher via
